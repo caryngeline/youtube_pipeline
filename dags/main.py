@@ -2,16 +2,8 @@ from airflow import DAG  # pyright: ignore[reportMissingImports]
 import pendulum  # pyright: ignore[reportMissingImports]
 from datetime import datetime, timedelta
 
-try:
-    from api.video_stats import get_playlist_id, get_video_ids, extract_video_data, save_to_json
-except ModuleNotFoundError:
-    # Fallback when dags/ is not on path (e.g. some Airflow setups)
-    import sys
-    from pathlib import Path
-    _dags_dir = Path(__file__).resolve().parent
-    if str(_dags_dir) not in sys.path:
-        sys.path.insert(0, str(_dags_dir))
-    from api.video_stats import get_playlist_id, get_video_ids, extract_video_data, save_to_json
+from api.video_stats import get_playlist_id, get_video_ids, extract_video_data, save_to_json
+from datawarehouse.dwh import core_table, staging_table
 
 # Define the timezone
 local_tz = pendulum.timezone("Asia/Manila")
@@ -47,3 +39,18 @@ with DAG(
 
     # Define dependecies
     playlist_id >> video_ids >> extract_data >> save_to_json_task
+
+with DAG(
+    dag_id = 'update_db',
+    default_args = default_args,
+    description = "DAG to process JSON file and insert data into both staging and core schemas",
+    schedule = '0 15 * * *',
+    catchup = False
+) as dag:
+
+    # Define tasks
+    update_staging = staging_table()
+    update_core = core_table()
+
+    # Define dependecies
+    update_staging >> update_core
