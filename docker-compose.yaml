@@ -56,6 +56,9 @@ x-airflow-common:
     &airflow-common-env
     # Set executor to CeleryExecutor 
     AIRFLOW__CORE__EXECUTOR: CeleryExecutor
+    # Force correct paths (overrides image; required if image has AIRFLOW_HOME=opt/airflow)
+    AIRFLOW_HOME: /opt/airflow
+    AIRFLOW__CORE__DAGS_FOLDER: /opt/airflow/dags
     # Use SQLAlchemy to connect to Airflow's metadata Postgres database using the psycopg2 driver
     AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${METADATA_DATABASE_USERNAME}:${METADATA_DATABASE_PASSWORD}@${POSTGRES_CONN_HOST}:${POSTGRES_CONN_PORT}/${METADATA_DATABASE_NAME}
     # Postgres database backend for storing task results executed by workers
