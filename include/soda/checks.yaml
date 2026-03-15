@@ -1,0 +1,21 @@
+checks for youtube_api:
+  # Missing values count should be 0 to PASS
+  - missing_count("Video_ID") = 0
+  # Duplicate values count should be 0 to PASS
+  - duplicate_count("Video_ID") = 0
+  
+  # Custom test using queries: The likes/comments count of the videos should not be greater than the views count
+  - likes_count_greater_than_video_views = 0:
+      name: Check for Like_Count greater than Video_Views
+      likes_count_greater_than_video_views query: |
+        SELECT COUNT(*) 
+        FROM youtube_api
+        WHERE "Likes_Count" > "Video_Views"
+
+  - comments_count_greater_than_video_views = 0:
+      name: Check for Comment_Count greater than Video_Views
+      comments_count_greater_than_video_views query: |
+        SELECT COUNT(*) 
+        FROM youtube_api
+        WHERE "Comments_Count" > "Video_Views"
+
