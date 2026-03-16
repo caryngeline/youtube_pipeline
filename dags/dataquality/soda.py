@@ -1,6 +1,6 @@
 import logging
 import os
-from airflow.operators.bash import BashOperator
+from airflow.operators.bash import BashOperator  # pyright: ignore[reportMissingImports]
 
 logger = logging.getLogger(__name__)
 
