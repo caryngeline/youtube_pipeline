@@ -91,3 +91,4 @@ with DAG(
 
     # Define dependecies
     soda_validate_staging >> soda_validate_core
+    

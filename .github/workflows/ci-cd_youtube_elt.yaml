@@ -83,6 +83,23 @@ jobs:
         - name: Set up Docker Compose
           if: steps.changed-files-tests.outputs.any_changed == 'true' || github.event_name == 'workflow_dispatch'
           run: docker compose up -d
+        - name: Wait for DAG registration
+          if: steps.changed-files-tests.outputs.any_changed == 'true' || github.event_name == 'workflow_dispatch'
+          run: |
+            docker exec -t airflow-worker sh -c '
+              set -e
+              echo "Waiting for DAGs to be registered in the metadata DB..."
+              for i in $(seq 1 60); do
+                airflow dags list | grep -q "^produce_json" \
+                  && airflow dags list | grep -q "^update_db" \
+                  && airflow dags list | grep -q "^data_quality" \
+                  && echo "All DAGs registered" && exit 0
+                echo "Not ready yet... ($i)"
+                sleep 2
+              done
+              echo "DAGs not registered in time"
+              airflow dags list
+              exit 1
         - name: Run Unit and Integration Tests
           if: steps.changed-files-tests.outputs.any_changed == 'true' || github.event_name == 'workflow_dispatch'
           run: docker exec -t airflow-worker sh -c "pytest tests/ -v"
