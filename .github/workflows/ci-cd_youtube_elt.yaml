@@ -18,7 +18,7 @@ jobs:
         - name: Checkout code
           uses: actions/checkout@v6
         - name: Get changed files
-          id: change-files-build
+          id: changed-files-build
           uses: tj-actions/changed-files@v47
           with: 
             files: |
@@ -73,7 +73,7 @@ jobs:
         - name: Checkout code
           uses: actions/checkout@v6
         - name: Get changed files
-          id: change-files-tests
+          id: changed-files-tests
           uses: tj-actions/changed-files@v47
           with: 
             files: |
